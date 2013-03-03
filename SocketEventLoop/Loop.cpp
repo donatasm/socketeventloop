@@ -48,9 +48,10 @@ namespace SocketEventLoop
 
     Loop::Loop()
     {
-        SocketCallbackDelegate^ callback = gcnew SocketCallbackDelegate(&SocketCallbackHandler);
-        _callbackHandle = GCHandle::Alloc(callback);
-        _callback = static_cast<SocketCallback>(Marshal::GetFunctionPointerForDelegate(callback).ToPointer());
+        SocketCallbackDelegate^ socketCallback = gcnew SocketCallbackDelegate(&SocketCallbackHandler);
+        IntPtr socketCallbackPtr = Marshal::GetFunctionPointerForDelegate(socketCallback);
+        _socketCallback = static_cast<SocketCallback>(socketCallbackPtr.ToPointer());
+        _socketCallbackHandle = GCHandle::Alloc(socketCallback);
         _loop = uv_loop_new();
     }
 
@@ -66,7 +67,7 @@ namespace SocketEventLoop
 
     Socket^ Loop::CreateSocket(int timeout)
     {
-        return gcnew Socket(_loop, _callback, timeout);
+        return gcnew Socket(_loop, _socketCallback, timeout);
     }
 
     Loop::~Loop()
@@ -77,9 +78,9 @@ namespace SocketEventLoop
             _loop = NULL;
         }
 
-        if (_callbackHandle.IsAllocated)
+        if (_socketCallbackHandle.IsAllocated)
         {
-            _callbackHandle.Free();
+            _socketCallbackHandle.Free();
         }
     }
 }

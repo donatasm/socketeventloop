@@ -21,8 +21,8 @@ namespace SocketEventLoop
         uv_loop_t* _loop;
 
     private:
-        GCHandle _callbackHandle;
-        SocketCallback _callback;
+        GCHandle _socketCallbackHandle;
+        SocketCallback _socketCallback;
         static initonly int DefaultTimeout = 1000; // 1 second
     };
 }
